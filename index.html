@@ -1,29 +1,66 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-    <title>HP B - Penerima</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HP Target - Receiver</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
     <style>
-        body { background: #000; color: #333; text-align: center; padding-top: 100px; transition: 0.5s; }
+        body { 
+            background: #000; 
+            color: white; 
+            text-align: center; 
+            padding-top: 100px; 
+            font-family: sans-serif; 
+            transition: 0.5s; 
+        }
+        #status { font-size: 30px; font-weight: bold; }
     </style>
 </head>
 <body>
-    <h1 id="status" style="color: white;">STANDBY (HP B)</h1>
+
+    <div id="status">MENUNGGU PERINTAH...</div>
+    <p style="color: #444; margin-top: 20px;">Ketuk layar satu kali agar izin getar aktif.</p>
+
     <script>
-        const firebaseConfig = { databaseURL: "https://maxrooot-default-rtdb.asia-southeast1.firebasedatabase.app/" };
+        // Konfigurasi Firebase Anda
+        const firebaseConfig = { 
+            databaseURL: "https://maxrooot-default-rtdb.asia-southeast1.firebasedatabase.app/" 
+        };
+        
         firebase.initializeApp(firebaseConfig);
         const dbRef = firebase.database().ref("jalur_kontrol");
 
+        // Mendengarkan perubahan data di Firebase
         dbRef.on("value", (snapshot) => {
             const data = snapshot.val();
+            const statusDiv = document.getElementById("status");
+
             if (data && data.perintah === "ON") {
-                document.body.style.background = "#22c55e"; 
-                document.getElementById("status").innerText = "ON - MENERIMA PERINTAH";
-                if (navigator.vibrate) navigator.vibrate([500, 200, 500]);
+                // Efek Visual
+                document.body.style.background = "#22c55e"; // Berubah jadi hijau
+                statusDiv.innerText = "HP TARGET: BERGETAR!";
+                
+                // PROGRAM GETAR (Vibrate)
+                // Angka 500 artinya bergetar selama 0,5 detik
+                if (navigator.vibrate) {
+                    navigator.vibrate(500); 
+                }
             } else {
+                // Kembali ke Standby
                 document.body.style.background = "#000";
-                document.getElementById("status").innerText = "OFF - STANDBY";
+                statusDiv.innerText = "STANDBY (MATI)";
+            }
+        });
+
+        // PENTING: Browser biasanya memblokir getar otomatis. 
+        // Anda harus mengetuk layar HP Target sekali agar izinnya aktif.
+        document.addEventListener('click', () => {
+            if (navigator.vibrate) {
+                navigator.vibrate(100); // Getar pendek tanda sudah aktif
+                console.log("Izin getar diaktifkan oleh pengguna");
             }
         });
     </script>
