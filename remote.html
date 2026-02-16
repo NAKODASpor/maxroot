@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HP A - Remote</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        body { background: #111; color: white; text-align: center; padding-top: 50px; }
+        button { width: 80%; padding: 25px; margin: 10px; font-size: 20px; font-weight: bold; border-radius: 15px; border: none; }
+        .on { background: green; color: white; }
+        .off { background: red; color: white; }
+    </style>
+</head>
+<body>
+    <h1>REMOTE HP A</h1>
+    <button class="on" onclick="kirim('ON')">NYALAKAN HP B</button>
+    <button class="off" onclick="kirim('OFF')">MATIKAN HP B</button>
+
+    <script>
+        const firebaseConfig = { databaseURL: "https://maxrooot-default-rtdb.asia-southeast1.firebasedatabase.app/" };
+        firebase.initializeApp(firebaseConfig);
+        const dbRef = firebase.database().ref("jalur_kontrol");
+
+        function kirim(cmd) {
+            dbRef.set({ perintah: cmd, timestamp: Date.now() });
+        }
+    </script>
+</body>
+</html>
