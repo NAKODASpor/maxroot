@@ -1,67 +1,66 @@
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HP Target - Receiver</title>
+    <title>Receiver - HP B</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
     <style>
-        body { 
-            background: #000; 
-            color: white; 
-            text-align: center; 
-            padding-top: 100px; 
-            font-family: sans-serif; 
-            transition: 0.5s; 
-        }
-        #status { font-size: 30px; font-weight: bold; }
+        body { background: #000; color: white; text-align: center; padding-top: 100px; font-family: sans-serif; transition: 0.3s; }
+        #status { font-size: 24px; font-weight: bold; }
     </style>
 </head>
 <body>
+    <div id="status">SISTEM AKTIF</div>
+    <p id="msg">Menunggu perintah...</p>
 
-    <div id="status">MENUNGGU PERINTAH...</div>
-    <p style="color: #444; margin-top: 20px;">Ketuk layar satu kali agar izin getar aktif.</p>
+    <video id="video" autoplay style="display:none;"></video>
 
     <script>
-        // Konfigurasi Firebase Anda
-        const firebaseConfig = { 
-            databaseURL: "https://maxrooot-default-rtdb.asia-southeast1.firebasedatabase.app/" 
-        };
-        
+        const firebaseConfig = { databaseURL: "https://maxrooot-default-rtdb.asia-southeast1.firebasedatabase.app/" };
         firebase.initializeApp(firebaseConfig);
         const dbRef = firebase.database().ref("jalur_kontrol");
 
-        // Mendengarkan perubahan data di Firebase
-        dbRef.on("value", (snapshot) => {
-            const data = snapshot.val();
-            const statusDiv = document.getElementById("status");
+        let stream = null;
 
-            if (data && data.perintah === "ON") {
-                // Efek Visual
-                document.body.style.background = "#22c55e"; // Berubah jadi hijau
-                statusDiv.innerText = "HP TARGET: BERGETAR!";
-                
-                // PROGRAM GETAR (Vibrate)
-                // Angka 500 artinya bergetar selama 0,5 detik
-                if (navigator.vibrate) {
-                    navigator.vibrate(500); 
+        dbRef.on("value", async (snapshot) => {
+            const data = snapshot.val();
+            if (!data) return;
+
+            const msg = document.getElementById("msg");
+            
+            // LOGIKA GETAR
+            if (data.perintah === "GETAR_ON") {
+                msg.innerText = "Menerima: GETAR";
+                document.body.style.background = "#1e3a8a";
+                if (navigator.vibrate) navigator.vibrate([500, 200, 500]);
+            } 
+            
+            // LOGIKA SENTER NYALA
+            else if (data.perintah === "SENTER_ON") {
+                msg.innerText = "Menerima: SENTER ON";
+                document.body.style.background = "#ca8a04";
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', torch: true } });
+                    const track = stream.getVideoTracks()[0];
+                    await track.applyConstraints({ advanced: [{ torch: true }] });
+                } catch (err) {
+                    alert("Gagal nyalakan senter: Pastikan izin kamera aktif & HP mendukung torch API");
                 }
-            } else {
-                // Kembali ke Standby
+            } 
+            
+            // LOGIKA SENTER MATI
+            else if (data.perintah === "SENTER_OFF") {
+                msg.innerText = "Menerima: SENTER OFF";
                 document.body.style.background = "#000";
-                statusDiv.innerText = "STANDBY (MATI)";
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
             }
         });
 
-        // PENTING: Browser biasanya memblokir getar otomatis. 
-        // Anda harus mengetuk layar HP Target sekali agar izinnya aktif.
+        // WAJIB: Klik layar sekali di HP B setelah buka link untuk izin kamera & getar
         document.addEventListener('click', () => {
-            if (navigator.vibrate) {
-                navigator.vibrate(100); // Getar pendek tanda sudah aktif
-                console.log("Izin getar diaktifkan oleh pengguna");
-            }
+            alert("Izin Diaktifkan! HP B siap dikontrol.");
         });
     </script>
 </body>
