@@ -1,20 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>HP A - Remote</title>
+    <title>Remote Control - HP A</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
-        body { background: #111; color: white; text-align: center; padding-top: 50px; }
-        button { width: 80%; padding: 25px; margin: 10px; font-size: 20px; font-weight: bold; border-radius: 15px; border: none; }
-        .on { background: green; color: white; }
-        .off { background: red; color: white; }
+        body { background: #111; color: white; text-align: center; font-family: sans-serif; padding: 20px; }
+        .group { border: 1px solid #333; padding: 15px; border-radius: 15px; margin-bottom: 20px; }
+        button { width: 100%; padding: 20px; margin: 10px 0; border-radius: 12px; border: none; font-weight: bold; font-size: 16px; cursor: pointer; }
+        .btn-green { background: #22c55e; color: white; }
+        .btn-red { background: #ef4444; color: white; }
+        .btn-blue { background: #3b82f6; color: white; }
     </style>
 </head>
 <body>
-    <h1>REMOTE HP A</h1>
-    <button class="on" onclick="kirim('ON')">NYALAKAN HP B</button>
-    <button class="off" onclick="kirim('OFF')">MATIKAN HP B</button>
+    <h2>CONTROL PANEL HP A</h2>
+
+    <div class="group">
+        <h3>KONTROL GETAR</h3>
+        <button class="btn-green" onclick="kirim('GETAR_ON')">GETARKAN HP B</button>
+    </div>
+
+    <div class="group">
+        <h3>KONTROL SENTER</h3>
+        <button class="btn-blue" onclick="kirim('SENTER_ON')">SENTER NYALA</button>
+        <button class="btn-red" onclick="kirim('SENTER_OFF')">SENTER MATI</button>
+    </div>
 
     <script>
         const firebaseConfig = { databaseURL: "https://maxrooot-default-rtdb.asia-southeast1.firebasedatabase.app/" };
